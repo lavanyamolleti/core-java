@@ -1,0 +1,234 @@
+Course Agenda:
+	Spring Core, 
+	Spring Test, 
+	Introduction to JPA, 
+	Spring Data JPA, 
+	Introduction to MVC
+
+Spring Framework
+	Java platform - comprehensive infrastructure support for developing java applications.
+	Spring handles the infrastructure
+	POJO(Plain Old Java Object)
+		Make a java method execute in a database transaction
+		Make a java method an HTTP endpoint 
+		Make a java method a message handler
+		Make a java method a management operation
+
+Beans - manages beans and dependency injection
+
+Java:
+	1. Composition-part of- strong association. Any changes that you perform in one component it will be highly affecting another component(high coupling)
+	2. Aggregation-part of- weak association. Any changes that you perform in one component it will NOT be highly affecting another component(loose coupling)
+	3. Generalization(Inheritance)
+
+Spring Core:
+------------
+1. Inversion of Control:
+
+class Employee{
+	Address address;
+}
+class Address{
+
+}
+
+1. Object creation logic
+	Address address = new Address();
+	Employee employee = new Employee();
+2. Dependency Injection
+	Binding address to the employee
+   Normal Flow:
+	employee, address ---> JVM(Container)
+   Inverse flow(IOC):
+	Another container/Spring Container(employee, address)--->Application code	
+
+JPA
+	EntityManager
+	EntityManagerFactory
+	EntityTransaction
+
+Spring Container is used to create and managing the bean instance
+
+2. Dependency Injection
+	form of IOC where dependencies are provided to a class by the container rather than class creating them
+	DI
+	  Constructor injection
+	  Setter injection
+          Field injection
+
+3. Spring Beans:
+	A bean is object that is managed by the Spring IOC container
+		XML configuration
+		Annotation based
+		Java based configuration
+
+    <bean id="address" class="com.accenture.ltt.day1.beans.Address">
+    	<property name="city" value="Chennai"></property>
+    </bean>
+Address address = new Address();
+address.setCity("Chennai");	
+    <bean id="employee" class="com.accenture.ltt.day1.beans.Employee">
+    	<property name="empName" value="Jones"></property>
+    	<property name="empSalary" value="1000.0"></property>
+    	<property name="address" ref="address"></property>
+    </bean>
+Employee employee = new Employee();
+employee.setEmpName("Jones")
+employee.setEmpSalary(1000.0);
+employee.setAddress(address);
+
+
+4. Spring Container
+	Spring Container is responsible for creating, configuring and managing the bean instances
+Types of containers
+	BeanFactory- basic functionalities, DI
+	ApplicationContext - superset of BeanFactory, managing the lifecycle events of the application
+
+Steps:
+------
+1. Create Java project
+2. Add the jars(Spring core jars)
+3. Create POJO classes(Employee, Address)
+4. Provide the XML configuration(Bean definitions) for Employee and Address
+5. Create the container by using ApplicationContext
+6. Get the bean instances and make use of it
+
+
+
+
+
+
+
+
+
+
+
+
+
+IOC:
+	DI(Setter based DI, Constructor based DI)
+	Autowiring
+
+DI
+--
+Setter based DI:
+	<bean id="skill"
+	Skill skill = new Skill();
+	<property name="skill" ref="skill"></property>//Setter DI
+	employee.setSkill(skill);
+XML Shortcut with p namespace:
+	xmlns:p = "http://www.springframework.org/schema/p"
+
+    <bean id="skill" class="com.accenture.ltt.day1.beans.Skill" p:skillName="Spring Framework">
+    </bean>
+    
+    <bean id="employee" class="com.accenture.ltt.day1.beans.Employee" p:empName="Jones" 
+    p:empSalary="2000.0" p:skill-ref="skill">
+    </bean>
+
+Constructor Injection:
+	Dependencies injected using constructor are called as mandatory dependencies
+    <constructor-arg value="Udhay"></constructor-arg>
+    <constructor-arg value="3000.0"></constructor-arg>
+    <constructor-arg ref="skill"></constructor-arg>
+Dependencies are injected based on order of the datatypes present in the constructor(String, Double, Skill)
+
+If parameters compose of non implicit reference datatype only then the order of the arguments does not matter
+
+class Employee{
+	Address address;
+	Contact contact;
+	Employee(Address address, Contact contact){
+		..
+	}
+}
+Both the below definitions works fine.
+
+<bean id="emp" class="Employee">
+    <constructor-arg ref="address"></constructor-arg>
+    <constructor-arg ref="contact"></constructor-arg>
+</bean>
+
+<bean id="emp" class="Employee">
+    <constructor-arg ref="contact"></constructor-arg>
+    <constructor-arg ref="address"></constructor-arg>
+</bean>
+
+Dependencies are injected based on order of the datatypes present in the constructor(String, Double, Skill)
+	If i change the order I will get UnsatisfiedDependencyException
+(1) Resolve this issue by providing type attribute
+(2) index attribute can be provided to specify the order of constructor argument(It starts from 0)
+(3) name attribute can be provided
+
+XML Shortcut with c namespace:
+	xmlns:c = "http://www.springframework.org/schema/c"
+
+Value Attribute and value tag:
+------------------------------
+    	<property name="skillName">
+    		<value>SpringMVC</value>
+    	</property>
+
+    <constructor-arg name="empName">
+	<value>Hari</value>
+    </constructor-arg>
+
+Mixed DI
+--------
+	Constructor and setter dependency can be used together while creating the beans
+	Constructor based DI - mandatory or immutable dependencies
+	Setter based DI - optional or mutable dependencies
+	Constructor based DI happens first followed by setter based
+
+Inner Bean
+----------
+    	<!-- Inner bean -->
+    	<property name="skill">
+    		    <bean class="com.accenture.ltt.day1.beans.Skill">
+    				<property name="skillName">
+    					<value>SpringMVC1</value>
+    				</property>
+    			</bean>
+    	</property>
+
+DI with Collection
+------------------
+list,set,map, properties
+
+    <bean id="employee" class="com.accenture.ltt.day1.beans.Employee">
+    	<property name="empName" value="Jacob"></property>
+    	<property name="empSalary" value="1000.0"></property>
+    	<property name="skill">
+    		<list>
+    			<ref bean="skill1"/>
+    			<ref bean = "skill2"/>
+    		</list>
+    	</property>
+    	<property name="map">
+    		<map>
+    			<entry key="1" value="One"></entry>
+    			<entry key="2" value="Two"></entry>
+    		</map>
+    	</property>
+    	<property name="properties">
+    		<props>
+    			<prop key="1">One</prop>
+    			<prop key="2">Two</prop>
+    		</props>
+    	</property>
+    </bean>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
